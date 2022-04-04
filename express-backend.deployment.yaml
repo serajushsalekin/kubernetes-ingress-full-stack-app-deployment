@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notebook-server
+  namespace: notebook
+  labels:
+    app: notebook-server
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notebook-server
+  template:
+    metadata:
+      labels:
+        app: notebook-server
+    spec:
+      containers:
+      - name: notebook-server
+        image: salekin/notebook-api
+        ports:
+        - containerPort: 5000
+        env:
+        - name: user
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-username
+        - name: pass
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongodb-password
+        - name: server
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: database_url
+        - name: dbname
+          valueFrom:
+            configMapKeyRef:
+              name: mongodb-configmap
+              key: database
+        volumeMounts:
+        - name: appsettings
+          mountPath: /usr/src/app/configuration
+          readOnly: true
+      volumes:
+      - name: appsettings
+        secret:
+          secretName: appsettings
+          items:
+          - key: appsettings
+            path: appsettings.json
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notebook-api-service
+  namespace: notebook
+spec:
+  selector:
+    app: notebook-server
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000

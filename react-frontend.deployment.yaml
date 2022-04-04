@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  notebook-framework
+  namespace: notebook
+  labels:
+    app:  notebook-framework
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notebook-framework
+  template:
+    metadata:
+      labels:
+        app: notebook-framework
+    spec:
+      containers:
+        - name: notebook-framework
+          image: salekin/notebook-client
+	  imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notebook-client-service
+  namespace: notebook
+spec:
+  selector:
+    app: notebook-framework
+  ports:
+  - protocol: TCP 
+    port: 80
+    targetPort: 80
