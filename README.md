@@ -6,7 +6,7 @@ This repository contains the Kubernetes configuration files for deploying a note
 
 Before deploying the application, ensure that you have the following prerequisites set up:
 
-- Kubernetes cluster
+- Kubernetes cluster [minikube]
 - `kubectl` command-line tool
 - Docker
 - Ingress addon
